@@ -1,16 +1,19 @@
-## Gold Layer Validation
+## Silver-to-Gold Reconciliation
 
-The Gold sales ETL job completed successfully using AWS Glue. The output is stored as Parquet data in Amazon S3 and cataloged as `sales_optimization_db.sales`.
+The Gold sales table was reconciled against the Silver order-item table using Amazon Athena.
 
-### Validation Results
+| Validation                         |        Result |
+| ---------------------------------- | ------------: |
+| Silver order-item rows             |       112,650 |
+| Gold sales rows                    |       112,650 |
+| Distinct orders in Silver          |        98,666 |
+| Distinct orders in Gold            |        98,666 |
+| Silver freight total               |  2,251,909.54 |
+| Gold freight total                 |  2,251,909.54 |
+| Gold item sales total              | 15,843,553.24 |
+| Recalculated item sales total      | 15,843,553.24 |
+| Row-level sales formula mismatches |             0 |
 
-* **Total sales item rows:** 112,650
-* **Distinct orders:** 98,666
-* **Possible duplicate order-item keys:** 0 detected
-* **Rows with negative item sales values:** 0 detected
-* **Rows missing price or freight:** 0 detected
-* **Athena query validation:** Successful
+The reconciliation confirmed that `item_sales_value` equals `price + freight_value` within a tolerance of 0.01 for every Gold row. Silver and Gold row counts, distinct-order counts, freight totals, and item sales totals also matched in the tested queries.
 
-The Gold table was queried using Amazon Athena. Aggregation checks also returned total item sales of approximately 15.84 million, total freight of approximately 2.25 million, and an average review score of approximately 4.03.
-
-These checks provide an initial validation of the Gold dataset. Further reconciliation against the Silver layer is recommended to verify business calculations and completeness.
+These results validate the tested metrics. Additional checks may be needed for business rules, join completeness, and other columns.
